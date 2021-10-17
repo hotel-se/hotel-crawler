@@ -12,32 +12,23 @@ class TripadvisorSpider(scrapy.Spider):
 
 
   def parse(self, response):
-    els = 0
+    for i in range(0, 100):
+      for hotel in response.css('.listItem'):
+        hotel_obj = Hotel()
 
-    for hotel in response.css('.listItem'):
-      els += 1
+        hotel_obj['url'] = f'https://tripadvisor.com/{str(hotel.css(".meta_listing::attr(data-url)").extract()[0]).strip()}'
+        hotel_obj['name'] = str(hotel.css('.listing_title>a::text').extract()[0]).strip()
 
-      hotel_obj = Hotel()
+        yield scrapy.Request(response.urljoin(hotel_obj['url']),
+                             callback=self.parse_details,
+                             cb_kwargs=dict(hotel=hotel_obj))
 
-      hotel_obj['url'] = f'https://tripadvisor.com/{str(hotel.css(".meta_listing::attr(data-url)").extract()[0]).strip()}'
-      hotel_obj['name'] = str(hotel.css('.listing_title>a::text').extract()[0]).strip()
-
-      yield scrapy.Request(response.urljoin(hotel_obj['url']),
-                           callback=self.parse_details,
-                           cb_kwargs=dict(hotel=hotel_obj))
-
-      if els % 30 == 0:
         request = {
-          'offset': f'{els}'
+          'offset': f'{i*30}'
         }
 
         headers = {
-          'x-puid': '96449683-5e31-4b47-9440-e197195db75e',
-          'DNT': '1',
-          'authority': 'www.tripadvisor.com',
-          'accept': 'text/html, */*',
-          'x-requested-with': 'XMLHttpRequest',
-          'referer': f'{response.request.url}'
+          'x-requested-with': 'XMLHttpRequest'
         }
 
         yield scrapy.FormRequest(response.request.url,
