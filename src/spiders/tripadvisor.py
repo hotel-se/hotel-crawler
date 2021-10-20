@@ -1,7 +1,6 @@
 import scrapy
 
 import json
-import requests
 from src.items import Hotel
 from src.coordinates import getCoordinates
 
