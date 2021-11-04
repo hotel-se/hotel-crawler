@@ -64,4 +64,6 @@ class TripadvisorSpider(scrapy.Spider):
     except IndexError:
       hotel['phone_number'] = None
 
+    hotel['source'] = 'tripadvisor'
+
     yield hotel
