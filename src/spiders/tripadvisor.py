@@ -2,6 +2,7 @@ import scrapy
 
 import json
 from src.items import Hotel
+from src.coordinates import getCoordinates
 
 class TripadvisorSpider(scrapy.Spider):
   name = 'tripadvisor'
@@ -46,16 +47,23 @@ class TripadvisorSpider(scrapy.Spider):
     n_ratings = response.css('.btQSs::text').extract()[0].split(' ')[0]
     hotel['rating'] = {'score': rating, 'n_ratings': n_ratings}
 
+    getCoordinates(hotel)
+
     try:
       description = json.loads(response.css('#ABOUT_TAB>div.ui_columns.uXLfx>div:nth-child(1)>div:nth-child(7)::attr(data-ssrev-handlers)').extract()[0])
       hotel['description'] = description['load'][3]['locationDescription']
     except (IndexError, KeyError):
-      description = json.loads(response.css('#ABOUT_TAB>div.ui_columns.uXLfx>div:nth-child(1)>div:nth-child(8)::attr(data-ssrev-handlers)').extract()[0])
-      hotel['description'] = description['load'][3]['locationDescription']
+      try:
+        description = json.loads(response.css('#ABOUT_TAB>div.ui_columns.uXLfx>div:nth-child(1)>div:nth-child(8)::attr(data-ssrev-handlers)').extract()[0])
+        hotel['description'] = description['load'][3]['locationDescription']
+      except (IndexError, KeyError):
+        hotel['description'] = None
     
     try:
       hotel['phone_number'] = str(response.xpath('//*[contains(concat( " ", @class, " " ), concat( " ", "mEnKG", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "ceIOZ", " " ))]/text()').extract()[0]).strip()
     except IndexError:
       hotel['phone_number'] = None
+
+    hotel['source'] = 'tripadvisor'
 
     yield hotel

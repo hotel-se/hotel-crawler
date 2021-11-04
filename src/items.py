@@ -14,3 +14,5 @@ class Hotel(scrapy.Item):
     description = scrapy.Field()
     rating = scrapy.Field()
     price = scrapy.Field()
+    coordinates = scrapy.Field()
+    source = scrapy.Field()
