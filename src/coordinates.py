@@ -2,8 +2,9 @@ import requests
 import json
 
 def getCoordinates(hotel):
-  # https://nominatim.openstreetmap.org/search?q=<query>&format=geojson
-  # features -> 0 -> geometry -> coordinates
+  if hotel['address'] == None :
+    hotel['coordinates'] = None
+    return
 
   try:
     r = requests.get(f'https://nominatim.openstreetmap.org/search?q={"+".join(hotel["address"].split(" "))}&format=geojson').content

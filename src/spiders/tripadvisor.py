@@ -41,7 +41,6 @@ class TripadvisorSpider(scrapy.Spider):
 
   def parse_details(self, response, hotel):
     hotel['address'] = str(response.xpath('//*[contains(concat( " ", @class, " " ), concat( " ", "yYjkv", " " ))]/text()').extract()[0]).strip()
-    hotel['price'] = None
     
     rating = response.css('.bvcwU::text').extract()[0]
     n_ratings = response.css('.btQSs::text').extract()[0].split(' ')[0]
