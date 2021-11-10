@@ -26,27 +26,30 @@ class BookingSpider(scrapy.Spider):
 
 
   def parse_details(self, response, hotel):
-    if response.css('.ArticleSubSection--content>.richtext::text').extract()[0].strip() != '':
-      hotel['description'] = response.css('.ArticleSubSection--content>.richtext::text').extract()[0].strip()
-    else:
+    try:
+      if response.css('.ArticleSubSection--content>.richtext::text').extract()[0].strip() != '':
+        hotel['description'] = response.css('.ArticleSubSection--content>.richtext::text').extract()[0].strip()
+      else:
+        hotel['description'] = None
+    except IndexError:
       hotel['description'] = None
 
-    address = ''
-
-    for i in response.css('.CardTeaser--text p:not(.t-dark)::text').extract():
-      address += i.strip()
-      address += ' '
-
     try:
+      address = ''
+
+      for i in response.css('.CardTeaser--text p:not(.t-dark)::text').extract()[:4]:
+        address += i.strip()
+        address += ' '
+
       hotel['address'] = address.strip().replace('\xa0', ' ')
-    except (IndexError, KeyError):
+    except IndexError:
       hotel['address'] = None
 
     getCoordinates(hotel)
 
     try:
       hotel['phone_number'] = response.css('.CardTeaser--text>p>.Link:not(.icon-after)::text').extract()[0].strip()
-    except (IndexError, KeyError):
+    except IndexError:
       hotel['phone_number'] = None
 
     hotel['rating'] = None

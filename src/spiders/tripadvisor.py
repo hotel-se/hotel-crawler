@@ -17,7 +17,7 @@ class TripadvisorSpider(scrapy.Spider):
       for hotel in response.css('.listItem'):
         hotel_obj = Hotel()
 
-        hotel_obj['url'] = f'https://tripadvisor.com/{str(hotel.css(".meta_listing::attr(data-url)").extract()[0]).strip()}'
+        hotel_obj['url'] = f'https://tripadvisor.com{str(hotel.css(".meta_listing::attr(data-url)").extract()[0]).strip()}'
         hotel_obj['name'] = str(hotel.css('.listing_title>a::text').extract()[0]).strip()
 
         yield scrapy.Request(response.urljoin(hotel_obj['url']),
