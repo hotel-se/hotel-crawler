@@ -23,10 +23,10 @@ class BookingSpider(scrapy.Spider):
                              callback=self.parse_details,
                              cb_kwargs=dict(hotel=hotel_obj))
 
-        page = i + 1
-        next_page = response.request.url.split('page=')[0] + 'page=' + str(page) + '&subtypes=Hotel'
+      page = i + 1
+      next_page = response.url.split('page=')[0] + 'page=' + str(page) + '&subtypes=Hotel'
 
-        yield scrapy.Request(next_page, callback=self.parse)
+      yield scrapy.Request(next_page, callback=self.parse)
 
 
   def parse_details(self, response, hotel):
